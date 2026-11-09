@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<!-- 12AK1111DFAA11*# -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Gawony OS 2.5.5 Beta</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;overflow:hidden;background:#000;color:#fff}
+.hidden{display:none!important}
+
+/* КРАСИВЫЙ ЛОГОТИП */
+.gawony-logo{width:90px;height:90px;border-radius:22px;background:linear-gradient(135deg,#4db8ff,#0078d7);position:relative;box-shadow:0 0 30px rgba(0,120,215,.6),inset 0 0 20px rgba(255,255,255,.3);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:7px;padding:14px;overflow:hidden;flex-shrink:0}
+.gawony-logo::before{content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 60%);pointer-events:none}
+.gawony-logo div{border-radius:2px;position:relative;z-index:1}
+.gawony-logo .g1{background:#008a00;box-shadow:inset 2px 2px 0 rgba(255,255,255,.2)}
+.gawony-logo .g2{background:#ff0000;box-shadow:inset 2px 2px 0 rgba(255,255,255,.2)}
+.gawony-logo .g3{background:#008a00;box-shadow:inset 2px 2px 0 rgba(255,255,255,.2)}
+.gawony-logo .g4{background:#fff;box-shadow:inset 2px 2px 0 rgba(0,0,0,.1)}
+.gawony-logo.tiny{width:26px;height:26px;padding:4px;gap:2px;border-radius:7px}
+
+/* ЭКРАНЫ */
+#install-screen,#boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(circle,#0a0a20,#000);z-index:100}
+#install-screen{display:none}
+#install-screen.active{display:flex}
+#install-screen h1{color:#00e5ff;margin:0;text-shadow:0 0 10px #00e5ff}
+#install-screen input{background:rgba(0,0,0,.6);border:1px solid #00e5ff;color:#fff;padding:12px;border-radius:10px;width:100%;max-width:300px;font-size:16px;outline:none}
+#install-screen button{padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#00e5ff,#b400ff);color:#fff;font-weight:bold;font-size:16px;width:100%;max-width:300px;cursor:pointer;box-shadow:0 0 15px rgba(0,229,255,.4)}
+#boot h1{font-size:24px;color:#4db8ff;margin:0;letter-spacing:2px}
+.bar{width:280px;height:8px;background:#222;border-radius:4px;overflow:hidden;border:1px solid rgba(0,229,255,.3)}
+#prog{height:100%;width:0;background:linear-gradient(90deg,#00e5ff,#b400ff,#00ff88);transition:.1s}
+
+/* ЛОГИН */
+#login{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:radial-gradient(circle,#0a0a20,#000);z-index:99;padding:16px}
+#login.active{display:flex}
+.box{background:rgba(15,15,35,.85);backdrop-filter:blur(20px);padding:24px;border-radius:20px;border:1px solid rgba(0,229,255,.3);display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px;box-shadow:0 0 30px rgba(0,0,0,0.8)}
+.box h2{text-align:center;font-size:18px;color:#00e5ff}
+.box input{background:rgba(0,0,0,.5);border:1px solid rgba(0,229,255,.3);color:#fff;padding:14px;border-radius:12px;outline:none;font-size:16px}
+.box button{padding:14px;border:none;border-radius:12px;cursor:pointer;font-weight:700;font-size:16px;background:linear-gradient(90deg,#00e5ff,#b400ff);color:#fff}
+#avs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#avs span{font-size:26px;text-align:center;padding:8px;border-radius:10px;cursor:pointer;background:rgba(0,0,0,.4);transition:.2s}
+#avs span.sel{background:#00e5ff33;box-shadow:0 0 10px #00e5ff;transform:scale(1.1)}
+
+/* РАБОЧИЙ СТОЛ */
+#os{position:fixed;inset:0}
+#wall{position:absolute;inset:0;background:linear-gradient(135deg,#0a0020,#1a0040,#000);z-index:0;transition:background .5s}
+#icons{position:absolute;top:10px;left:10px;right:10px;bottom:80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px;align-content:start;z-index:1;overflow-y:auto;padding:10px}
+.icon{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border-radius:14px;padding:10px;text-align:center;font-size:12px;transition:.2s}
+.icon:active{background:rgba(0,229,255,.15);transform:scale(0.95)}
+.icon .em{font-size:38px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.5))}
+
+/* ПАНЕЛЬ ЗАДАЧ */
+#bar{position:absolute;bottom:0;left:0;right:0;height:64px;background:rgba(10,10,25,.95);backdrop-filter:blur(20px);border-top:1px solid rgba(0,229,255,.2);display:flex;align-items:center;padding:0 12px;gap:8px;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+#start{background:linear-gradient(90deg,#00e5ff,#b400ff);color:#000;border:none;padding:10px 16px;border-radius:14px;font-weight:700;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:6px;box-shadow:0 0 10px rgba(0,229,255,.3)}
+#tasks{flex:1;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+#tasks::-webkit-scrollbar{display:none}
+#tasks button{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.1);padding:8px 12px;border-radius:10px;font-size:12px;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;transition:.2s}
+#tasks button:active{background:rgba(0,229,255,.2);border-color:#00e5ff}
+#clock,#lang{font-size:14px;font-weight:600;padding:0 6px;opacity:.9}
+
+/* МЕНЮ ПУСК */
+#menu{position:absolute;bottom:74px;left:10px;right:10px;max-height:70vh;background:rgba(15,15,35,.98);backdrop-filter:blur(25px);border:1px solid rgba(0,229,255,.3);border-radius:20px;padding:16px;z-index:60;display:none;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,0.8)}
+#menu.active{display:flex;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+#search{background:rgba(0,0,0,.5);border:1px solid rgba(0,229,255,.3);color:#fff;padding:14px;border-radius:12px;outline:none;font-size:16px;width:100%}
+#applist{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow-y:auto;max-height:50vh}
+#applist .a{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;cursor:pointer;font-size:11px;text-align:center;transition:.2s}
+#applist .a:active{background:rgba(0,229,255,.15);transform:scale(0.95)}
+#applist .a .em{font-size:30px}
+
+/* ОКНА (АНИМАЦИЯ) */
+#wins{position:absolute;inset:0;pointer-events:none;z-index:20}
+.win{position:absolute;background:rgba(15,15,35,.96);backdrop-filter:blur(25px);border:1px solid rgba(0,229,255,.3);border-radius:20px;min-width:260px;min-height:180px;display:flex;flex-direction:column;pointer-events:auto;overflow:hidden;box-shadow:0 15px 50px rgba(0,0,0,0.6);animation:openWin 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards}
+@keyframes openWin{0%{opacity:0;transform:scale(0.85) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.win.closing{animation:closeWin 0.2s ease forwards}
+@keyframes closeWin{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.9) translateY(20px)}}
+.win.max{inset:0 0 64px 0!important;width:auto!important;height:auto!important;border-radius:0}
+.win-h{display:flex;align-items:center;padding:14px;background:rgba(0,229,255,.1);cursor:move;gap:10px;font-size:15px;font-weight:600;touch-action:none;border-bottom:1px solid rgba(0,229,255,.1)}
+.win-h .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.win-h button{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px 12px;border-radius:10px;min-width:36px;transition:.2s}
+.win-h button:active{background:rgba(255,80,80,.8)}
+.win-b{flex:1;overflow:auto;padding:16px;font-size:14px;-webkit-overflow-scrolling:touch}
+.win-b input,.win-b textarea{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(0,229,255,.3);color:#fff;padding:14px;border-radius:12px;outline:none;margin:6px 0;font-size:15px;font-family:inherit;transition:.2s}
+.win-b input:focus,.win-b textarea:focus{border-color:#00e5ff;box-shadow:0 0 10px rgba(0,229,255,.2)}
+.win-b button{background:rgba(0,229,255,.15);color:#fff;border:1px solid rgba(0,229,255,.4);padding:12px 16px;border-radius:12px;cursor:pointer;margin:6px 6px 6px 0;font-size:14px;transition:.2s}
+.win-b button:active{background:rgba(0,229,255,.4);transform:scale(0.95)}
+.resize{position:absolute;right:0;bottom:0;width:28px;height:28px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,rgba(0,229,255,.4) 50%);touch-action:none}
+
+/* УВЕДОМЛЕНИЯ */
+#notes{position:absolute;top:16px;right:16px;left:16px;display:flex;flex-direction:column;gap:10px;z-index:300;pointer-events:none}
+.note{background:rgba(15,15,35,.98);border:1px solid rgba(0,229,255,.6);padding:16px;border-radius:14px;font-size:14px;animation:slideIn 0.3s ease;box-shadow:0 5px 20px rgba(0,0,0,0.5);pointer-events:auto}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* НАСТРОЙКИ */
+.setting-item{padding:14px;background:rgba(0,229,255,.04);border-radius:14px;border:1px solid rgba(0,229,255,.1);margin-bottom:8px}
+.setting-item b{display:block;margin-bottom:8px;color:#00e5ff}
+</style>
+</head>
+<body>
+
+<div id="install-screen" class="inst-screen">
+  <div class="gawony-logo"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div></div>
+  <h1>Установка Gawony OS 2.5.5 Beta</h1>
+  <input id="install-name" placeholder="Имя пользователя" value="Admin">
+  <input id="install-pass" type="password" placeholder="Пароль">
+  <button onclick="startInstallProcess()">Установить</button>
+</div>
+
+<div id="boot">
+  <div class="gawony-logo"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div></div>
+  <h1>GAWONY OS 2.5.5</h1>
+  <div class="bar"><div id="prog"></div></div>
+  <p id="btext" style="color:#888;font-size:14px">Загрузка...</p>
+</div>
+
+<div id="login">
+  <div class="box">
+    <div class="gawony-logo" style="margin:0 auto"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div></div>
+    <h2>Вход в систему</h2>
+    <input id="uname" placeholder="Имя">
+    <div id="avs"></div>
+    <input id="upass" type="password" placeholder="Пароль">
+    <button id="blogin">ВОЙТИ</button>
+  </div>
+</div>
+
+<div id="os" class="hidden">
+  <div id="wall"></div>
+  <div id="icons"></div>
+  <div id="wins"></div>
+  <div id="bar">
+    <button id="start"><span class="gawony-logo tiny"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div></span> Пуск</button>
+    <div id="tasks"></div>
+    <span id="clock">--:--</span>
+  </div>
+  <div id="menu">
+    <input id="search" placeholder="Поиск приложений...">
+    <div id="applist"></div>
+  </div>
+  <div id="notes"></div>
+</div>
+
+<script>
+var SAVE_KEY='kastomoscc_255';
+var defaultState={user:'Пользователь',avatar:'👤',theme:'dark',wall:0,lang:'RU',installed:false,version:'2.5.5',password:'',hasPass:false,key:''};
+var state=Object.assign({},defaultState);
+try{var s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s){for(var k in s)state[k]=s[k];}}catch(e){}
+
+var noSave=false;
+function save(){if(noSave)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(e){}}
+function hashPass(p){var h=0;for(var i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0;}return String(h);}
+
+function startInstallProcess(){
+  var n=document.getElementById('install-name').value.trim()||'Admin';
+  var p=document.getElementById('install-pass').value.trim();
+  if(!p){alert('Введите пароль!');return;}
+  
+  // Генерируем ключ профиля
+  if(!state.key){
+    var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var k="GAW-";
+    for(var i=0;i<4;i++)k+=chars.charAt(Math.floor(Math.random()*chars.length));
+    k+="-";
+    for(var i=0;i<4;i++)k+=chars.charAt(Math.floor(Math.random()*chars.length));
+    state.key = k;
+  }
+  
+  state.user=n;state.password=hashPass(p);state.hasPass=true;state.installed=true;
+  save();
+  
+  // Быстрая имитация установки
+  setTimeout(function(){ location.reload(); }, 1000);
+}
+
+function startSystem(){
+  if(!state.installed){
+    document.getElementById('install-screen').style.display='flex';
+    document.getElementById('boot').style.display='none';
+    return;
+  }
+  document.getElementById('install-screen').style.display='none';
+  document.getElementById('boot').style.display='flex';
+  
+  var prog=0;
+  var bt=setInterval(function(){
+    prog+=Math.random()*15+5;if(prog>100)prog=100;
+    document.getElementById('prog').style.width=prog+'%';
+    if(prog>=100){
+      clearInterval(bt);
+      setTimeout(function(){
+        document.getElementById('boot').style.display='none';
+        document.getElementById('login').classList.add('active');
+        initLogin();
+      },300);
+    }
+  },80);
+}
+
+var chosenAvatar=state.avatar||'👤';
+function initLogin(){
+  var avs=document.getElementById('avs');avs.innerHTML='';
+  ['👤','😎','🐱','🦊','🐼','👾','🤖','🌟'].forEach(function(a){
+    var sp=document.createElement('span');sp.textContent=a;
+    if(a===chosenAvatar)sp.classList.add('sel');
+    sp.onclick=function(){document.querySelectorAll('#avs span').forEach(function(x){x.classList.remove('sel');});sp.classList.add('sel');chosenAvatar=a;};
+    avs.appendChild(sp);
+  });
+  document.getElementById('uname').value=state.user==='Пользователь'?'':state.user;
+}
+
+document.getElementById('blogin').onclick=function(){
+  var n=document.getElementById('uname').value.trim()||'Пользователь';
+  var p=document.getElementById('upass').value;
+  if(state.hasPass&&hashPass(p)!==state.password){alert('Неверный пароль!');return;}
+  state.user=n;state.avatar=chosenAvatar;save();enterOS();
+};
+
+function enterOS(){
+  document.getElementById('login').classList.remove('active');
+  document.getElementById('os').classList.remove('hidden');
+  applyTheme();renderDesktop();renderStart();startClock();
+}
+
+function applyTheme(){
+  var walls=['linear-gradient(135deg,#0a0020,#1a0040,#000)','linear-gradient(135deg,#001a2c,#003355,#000)','linear-gradient(135deg,#2c001a,#550033,#000)'];
+  document.getElementById('wall').style.background=walls[state.wall]||walls[0];
+}
+function renderDesktop(){
+  var APPS=[{k:'settings',n:'Настройки',e:'⚙️'},{k:'calc',n:'Калькулятор',e:'🧮'},{k:'notepad',n:'Блокнот',e:'📝'},{k:'files',n:'Проводник',e:'📁'},{k:'term',n:'Терминал',e:'⌨️'},{k:'games',n:'Игры',e:'🎮'},{k:'logout',n:'Выход',e:'🚪'}];
+  var c=document.getElementById('icons');c.innerHTML='';
+  APPS.forEach(function(a){
+    var d=document.createElement('div');d.className='icon';
+    d.innerHTML='<div class="em">'+a.e+'</div><div>'+a.n+'</div>';
+    d.onclick=function(){openApp(a.k);};
+    c.appendChild(d);
+  });
+}
+function renderStart(){
+  var APPS=[{k:'settings',n:'Настройки',e:'⚙️'},{k:'calc',n:'Калькулятор',e:'🧮'},{k:'notepad',n:'Блокнот',e:'📝'},{k:'files',n:'Проводник',e:'📁'},{k:'term',n:'Терминал',e:'⌨️'},{k:'games',n:'Игры',e:'🎮'},{k:'logout',n:'Выход',e:'🚪'}];
+  var c=document.getElementById('applist');c.innerHTML='';
+  APPS.forEach(function(a){
+    var d=document.createElement('div');d.className='a';
+    d.innerHTML='<div class="em">'+a.e+'</div><div>'+a.n+'</div>';
+    d.onclick=function(){openApp(a.k);document.getElementById('menu').classList.remove('active');};
+    c.appendChild(d);
+  });
+}
+
+var clockInterval=null;
+function startClock(){
+  if(clockInterval)clearInterval(clockInterval);
+  var upd=function(){var d=new Date();document.getElementById('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);};
+  upd();clockInterval=setInterval(upd,10000);
+}
+
+document.getElementById('start').onclick=function(){document.getElementById('menu').classList.toggle('active');};
+document.getElementById('search').oninput=function(e){
+  var q=e.target.value.toLowerCase();
+  document.querySelectorAll('#applist .a').forEach(function(el){el.style.display=el.textContent.toLowerCase().indexOf(q)>-1?'':'none';});
+};
+
+var zTop=100;var openWins={};
+function openApp(k){
+  if(k==='logout'){logout();return;}
+  if(openWins[k]){openWins[k].style.zIndex=++zTop;return;}
+  var app=null;var APPS=[{k:'settings',n:'Настройки',e:'⚙️'},{k:'calc',n:'Калькулятор',e:'🧮'},{k:'notepad',n:'Блокнот',e:'📝'},{k:'files',n:'Проводник',e:'📁'},{k:'term',n:'Терминал',e:'⌨️'},{k:'games',n:'Игры',e:'🎮'},{k:'logout',n:'Выход',e:'🚪'}];
+  for(var i=0;i<APPS.length;i++)if(APPS[i].k===k)app=APPS[i];
+  if(!app)return;
+  var win=document.createElement('div');win.className='win';
+  win.style.width=window.innerWidth<600?'90%':'450px';
+  win.style.height=window.innerWidth<600?'70%':'350px';
+  win.style.left='5%';win.style.top='10%';
+  win.style.zIndex=++zTop;
+  win.innerHTML='<div class="win-h"><span>'+app.e+'</span><span class="t">'+app.n+'</span><button onclick="closeWin(\''+k+'\')">✕</button></div><div class="win-b">'+renderApp(k)+'</div>';
+  document.getElementById('wins').appendChild(win);
+  openWins[k]=win;
+  var t=document.createElement('button');t.textContent=app.n;t.onclick=function(){if(win.style.display==='none')win.style.display='flex';else win.style.display='none';};
+  document.getElementById('tasks').appendChild(t);
+  bindApp(k,win.querySelector('.win-b'));
+}
+
+function closeWin(k){
+  if(openWins[k]){
+    openWins[k].classList.add('closing');
+    var w=openWins[k]; var t=document.getElementById('task-'+k);
+    setTimeout(function(){
+      if(w.parentNode)w.remove();
+      if(t)t.remove();
+    }, 200);
+    delete openWins[k];
+  }
+}
+
+function renderApp(k){
+  if(k==='settings')return settingsHTML();
+  if(k==='notepad')return '<textarea style="height:200px" oninput="localStorage.setItem(\'np\',this.value)">'+(localStorage.getItem('np')||'')+'</textarea>';
+  if(k==='calc')return '<div id="cd" style="background:#000;color:#0f0;padding:14px;font-size:24px;text-align:right;border-radius:10px">0</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">'+['C','/','*','-','7','8','9','+','4','5','6','=','1','2','3','0'].map(function(b){return '<button onclick="calcBtn(\''+b+'\')">'+b+'</button>';}).join('')+'</div>';
+  if(k==='files')return '<div>📁 Диск C: (Система)<br>📁 Диск D: (Приложения)</div>';
+  if(k==='term')return '<div id="term-out" style="background:#000;color:#0f0;padding:10px;height:150px;overflow:auto;border-radius:10px">Терминал. help</div><input id="term-in" placeholder="help"><button onclick="termRun()">↵</button>';
+  if(k==='games')return '<div style="text-align:center;padding:20px"><h3>🎮 Игры</h3><button onclick="alert(\'Игра\')">Змейка</button></div>';
+  return '<div style="text-align:center;padding:20px">Приложение '+k+' работает</div>';
+}
+
+function bindApp(k,el){
+  if(k==='calc'){var expr='';window.calcBtn=function(b){if(b==='C')expr='';else if(b==='='){try{expr=String(eval(expr))}catch(e){expr=''}}else expr+=b;el.querySelector('#cd').textContent=expr||'0';};}
+  if(k==='term'){window.termRun=function(){var inp=el.querySelector('#term-in');var out=el.querySelector('#term-out');out.innerHTML+='<br>> '+inp.value;inp.value='';out.scrollTop=out.scrollHeight;};}
+}
+
+function settingsHTML(){
+  var items=[
+    ['О системе','Gawony OS v'+state.version+' Beta'],
+    ['Имя пользователя','<input value="'+state.user+'" oninput="state.user=this.value;save()">'],
+    ['Ключ профиля','<div style="background:#222;padding:12px;border-radius:8px;text-align:center;font-family:monospace;color:#ffaa00;font-size:18px;letter-spacing:2px">'+state.key+'</div>'],
+    ['Обновления','<button onclick="openGithubUpdate()" style="background:#00ff88;color:#000;width:100%">🚀 ОБНОВИТЬСЯ ЧЕРЕЗ GITHUB</button>'],
+    ['Выход','<button onclick="logout()">🚪 Выйти</button>']
+  ];
+  var html='';
+  for(var i=0;i<items.length;i++){
+    html+='<div class="setting-item"><b>'+(i+1)+'. '+items[i][0]+'</b>'+items[i][1]+'</div>';
+  }
+  return html;
+}
+
+function logout(){
+  if(!confirm('Выйти?'))return;
+  save(); location.reload();
+}
+
+// ================= ОБНОВЛЕНИЕ ЧЕРЕЗ GITHUB 2.5.5 =================
+var SECRET_KEY = "12AK1111DFAA11*#";
+
+function openGithubUpdate() {
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px';
+  
+  modal.innerHTML = `
+    <div style="background:#111;border:2px solid #00e5ff;border-radius:20px;padding:20px;max-width:400px;width:100%;text-align:left">
+      <h2 style="color:#00e5ff;margin-top:0;text-align:center">Обновление 2.5.5</h2>
+      
+      <div style="background:#222;border:1px solid #ffaa00;border-radius:10px;padding:10px;margin-bottom:15px;text-align:center">
+        <p style="font-size:11px;color:#ffaa00;margin:0">ВАШ КЛЮЧ ПРОФИЛЯ:</p>
+        <p style="font-size:18px;color:#fff;margin:5px 0;font-family:monospace">${state.key}</p>
+        <p style="font-size:10px;color:#888;margin:0">Введите его ниже, чтобы сохранить данные</p>
+      </div>
+      
+      <input id="gh-link" placeholder="Ссылка на файл (Raw)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #00e5ff;background:#000;color:#fff;margin-bottom:10px;box-sizing:border-box">
+      <input id="gh-key" placeholder="Ключ профиля (GAW-...)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ffaa00;background:#000;color:#fff;margin-bottom:15px;box-sizing:border-box">
+      
+      <div style="display:flex;gap:10px">
+        <button onclick="this.closest('div').parentElement.parentElement.remove()" style="flex:1;padding:10px;background:#333;color:#fff;border:none;border-radius:8px;cursor:pointer">Отмена</button>
+        <button id="gh-btn" style="flex:1;padding:10px;background:#00e5ff;color:#000;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Скачать</button>
+      </div>
+      
+      <div id="gh-status" style="margin-top:15px;font-size:12px;color:#00ff88;text-align:center"></div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  document.getElementById('gh-btn').onclick = function() {
+    var url = document.getElementById('gh-link').value.trim();
+    var userKey = document.getElementById('gh-key').value.trim();
+    var status = document.getElementById('gh-status');
+    var btn = document.getElementById('gh-btn');
+    
+    if(!url || !userKey) {
+      status.style.color = '#ff0044';
+      status.textContent = 'Заполни все поля!';
+      return;
+    }
+    
+    if(userKey !== state.key) {
+      status.style.color = '#ff0044';
+      status.textContent = '❌ Неверный ключ профиля!';
+      return;
+    }
+    
+    status.style.color = '#00e5ff';
+    status.textContent = 'Скачивание обновления...';
+    btn.disabled = true;
+    
+    fetch(url).then(function(res) {
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.text();
+    }).then(function(html) {
+      status.textContent = 'Проверка файла...';
+      if(html.indexOf(SECRET_KEY) === -1) throw new Error('Файл неофициальный!');
+      
+      status.style.color = '#00ff88';
+      status.textContent = '✅ Обновление установлено!';
+      
+      // Сохраняем профиль и ключ
+      localStorage.setItem('gawony_user_backup', JSON.stringify({
+        user:state.user, password:state.password, avatar:state.avatar, key:state.key, installed:true
+      }));
+      
+      setTimeout(function() {
+        document.open(); document.write(html); document.close();
+      }, 1000);
+      
+    }).catch(function(err) {
+      status.style.color = '#ff0044';
+      status.textContent = '❌ ' + err.message;
+      btn.disabled = false;
+    });
+  };
+}
+
+function restoreUserData(){
+  var backup=localStorage.getItem('gawony_user_backup');
+  if(backup){
+    try{
+      var data=JSON.parse(backup);
+      for(var k in data){state[k]=data[k];}
+      localStorage.removeItem('gawony_user_backup');
+      save();
+    }catch(e){}
+  }
+}
+
+// Запуск
+restoreUserData();
+startSystem();
+setInterval(save,5000);
+</script>
+</body>
+</html>
